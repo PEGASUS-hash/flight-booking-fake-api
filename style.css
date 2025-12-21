@@ -1,64 +1,119 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background: #f4f6f8;
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background:
+      linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+      url("https://images.unsplash.com/photo-1529070538774-1843cb3265df")
+      no-repeat center/cover;
+    min-height: 100vh;
+    color: white;
     text-align: center;
 }
 
 h1 {
     margin-top: 20px;
+    animation: fadeDown 1s ease;
 }
 
-.search-box {
+/* STEPS */
+.steps {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
     margin: 20px;
 }
 
-.search-box input, button {
-    padding: 10px;
-    margin: 5px;
+.step {
+    padding: 8px 15px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.3);
+    font-size: 14px;
 }
 
+.step.active {
+    background: #00c6ff;
+    color: black;
+}
+
+/* SEARCH */
+.search-box {
+    background: rgba(255,255,255,0.15);
+    padding: 20px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    margin: 30px auto;
+    backdrop-filter: blur(8px);
+    animation: fadeUp 1s ease;
+}
+
+.search-box input,
+.search-box button {
+    width: 90%;
+    padding: 12px;
+    margin: 8px;
+    border-radius: 8px;
+    border: none;
+}
+
+/* FLIGHT CARDS */
 .card {
     background: white;
-    padding: 15px;
-    margin: 10px auto;
-    width: 300px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    color: #333;
+    padding: 20px;
+    margin: 15px auto;
+    width: 320px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    animation: fadeUp 0.6s ease;
 }
 
+/* BUTTON */
 button {
-    background: #0066ff;
+    background: linear-gradient(135deg, #0066ff, #00c6ff);
     color: white;
-    border: none;
-    border-radius: 5px;
+    font-weight: bold;
     cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 button:hover {
-    background: #004dcc;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
 }
 
-/* Modal */
+/* MODAL */
 .modal {
     display: none;
     position: fixed;
-    top: 0; 
-    left: 0;
-    width: 100%; 
-    height: 100%;
-    background: rgba(0,0,0,0.5);
+    inset: 0;
+    background: rgba(0,0,0,0.7);
     justify-content: center;
     align-items: center;
 }
 
 .modal-content {
     background: white;
-    padding: 20px;
-    border-radius: 10px;
-    width: 300px;
+    color: #333;
+    padding: 25px;
+    width: 320px;
+    border-radius: 15px;
+    animation: scaleIn 0.4s ease;
 }
 
-/* Seats */
+.modal-content input {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+/* SEATS */
 .seats {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -69,20 +124,37 @@ button:hover {
 .seat {
     padding: 8px;
     background: #ddd;
+    border-radius: 5px;
     cursor: pointer;
-    border-radius: 4px;
+    transition: transform 0.2s;
 }
 
 .seat:hover {
-    background: #bbb;
+    transform: scale(1.1);
 }
 
 .occupied {
-    background: red;
+    background: crimson;
     cursor: not-allowed;
 }
 
 .selected {
-    background: green;
+    background: #28a745;
     color: white;
+}
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0.8); }
+    to { transform: scale(1); }
 }
