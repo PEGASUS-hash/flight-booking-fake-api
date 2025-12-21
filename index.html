@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flight Booking</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>✈️ Flight Booking System</h1>
+
+<div class="search-box">
+    <input type="text" id="from" placeholder="From city">
+    <input type="text" id="to" placeholder="To city">
+    <input type="date" id="date">
+    <button onclick="searchFlights()">Search</button>
+</div>
+
+<div id="results"></div>
+
+<!-- Seat Selection Modal -->
+<div id="seatModal" class="modal">
+    <div class="modal-content">
+        <h2>Select Seat</h2>
+        <div id="seats" class="seats"></div>
+        <button onclick="showPassengerForm()">Next</button>
+    </div>
+</div>
+
+<!-- Passenger Form -->
+<div id="passengerModal" class="modal">
+    <div class="modal-content">
+        <h2>Passenger Information</h2>
+        <input type="text" id="name" placeholder="Full Name">
+        <input type="text" id="contact" placeholder="Email or Phone">
+        <button onclick="showPayment()">Confirm Booking</button>
+    </div>
+</div>
+
+<!-- Payment -->
+<div id="paymentModal" class="modal">
+    <div class="modal-content">
+        <h2>Payment Summary</h2>
+        <p>Selected Seat: <b id="seatInfo"></b></p>
+        <p>Total Price: <b>150 €</b></p>
+        <button onclick="pay()">Pay Now</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
