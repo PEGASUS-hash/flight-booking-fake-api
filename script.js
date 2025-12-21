@@ -1,43 +1,41 @@
 const flights = [
     {
-        id: 1,
         airline: "Air France",
-        from: "Paris",
-        to: "London",
-        depart: "08:00",
-        arrive: "09:30",
+        route: "Paris → London",
+        time: "08:00 - 09:30",
         price: 120
     },
     {
-        id: 2,
         airline: "Ryanair",
-        from: "Paris",
-        to: "London",
-        depart: "12:00",
-        arrive: "13:20",
+        route: "Paris → London",
+        time: "12:00 - 13:20",
         price: 90
     },
     {
-        id: 3,
         airline: "British Airways",
-        from: "Paris",
-        to: "London",
-        depart: "18:00",
-        arrive: "19:30",
+        route: "Paris → London",
+        time: "18:00 - 19:30",
         price: 150
     }
 ];
 
 let selectedSeat = "";
 
+function setStep(stepNumber) {
+    document.querySelectorAll(".step").forEach((s, i) => {
+        s.classList.toggle("active", i === stepNumber - 1);
+    });
+}
+
 function searchFlights() {
+    setStep(1);
     let html = "";
     flights.forEach(f => {
         html += `
             <div class="card">
                 <h3>${f.airline}</h3>
-                <p>${f.from} → ${f.to}</p>
-                <p>${f.depart} - ${f.arrive}</p>
+                <p>${f.route}</p>
+                <p>${f.time}</p>
                 <p><b>${f.price} €</b></p>
                 <button onclick="openSeatMap()">Book</button>
             </div>
@@ -46,44 +44,49 @@ function searchFlights() {
     document.getElementById("results").innerHTML = html;
 }
 
+/* STEP 2 */
 function openSeatMap() {
-    document.getElementById("seatModal").style.display = "flex";
-    let seatHtml = "";
+    setStep(2);
+    seatModal.style.display = "flex";
+    let seats = "";
 
     for (let i = 1; i <= 20; i++) {
-        let occupied = i % 5 === 0;
-        seatHtml += `
+        let occupied = i % 6 === 0;
+        seats += `
             <div class="seat ${occupied ? 'occupied' : ''}"
-                onclick="${occupied ? '' : `selectSeat('A${i}', this)`}">
-                A${i}
-            </div>
-        `;
+            onclick="${occupied ? '' : `selectSeat('A${i}', this)`}">
+            A${i}
+            </div>`;
     }
-    document.getElementById("seats").innerHTML = seatHtml;
+    document.getElementById("seats").innerHTML = seats;
 }
 
-function selectSeat(seat, element) {
+function selectSeat(seat, el) {
     document.querySelectorAll(".seat").forEach(s => s.classList.remove("selected"));
-    element.classList.add("selected");
+    el.classList.add("selected");
     selectedSeat = seat;
 }
 
+/* STEP 3 */
 function showPassengerForm() {
     if (!selectedSeat) {
-        alert("Please select a seat");
+        alert("Please select a seat first");
         return;
     }
-    document.getElementById("seatModal").style.display = "none";
-    document.getElementById("passengerModal").style.display = "flex";
+    setStep(3);
+    seatModal.style.display = "none";
+    passengerModal.style.display = "flex";
 }
 
+/* STEP 4 */
 function showPayment() {
-    document.getElementById("passengerModal").style.display = "none";
-    document.getElementById("paymentModal").style.display = "flex";
+    setStep(4);
+    passengerModal.style.display = "none";
+    paymentModal.style.display = "flex";
     document.getElementById("seatInfo").innerText = selectedSeat;
 }
 
 function pay() {
-    alert("Payment Successful ✅");
+    alert("Payment Successful ✅\nThank you for your booking!");
     location.reload();
 }
