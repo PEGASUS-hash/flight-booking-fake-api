@@ -1,68 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Flight Booking</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>SkyBook – Flight Booking</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>✈️ Flight Booking System</h1>
-
-<!-- STEPS -->
-<div class="steps">
-    <div class="step active">1. Flight</div>
-    <div class="step">2. Seat</div>
-    <div class="step">3. Passenger</div>
-    <div class="step">4. Payment</div>
-</div>
+<header>
+  <h1>✈️ SkyBook</h1>
+  <p>Search & Book Flights Easily</p>
+</header>
 
 <!-- SEARCH -->
-<div class="search-box">
-    <input type="text" placeholder="From city">
-    <input type="text" placeholder="To city">
-    <input type="date">
-    <button onclick="searchFlights()">Search Flights</button>
+<section class="search-box">
+  <input id="fromCity" type="text" placeholder="From (e.g. RA)">
+  <div id="fromList" class="suggestions"></div>
+
+  <input id="toCity" type="text" placeholder="To (e.g. BAR)">
+  <div id="toList" class="suggestions"></div>
+
+  <input id="dateInput" type="month">
+  <button onclick="searchFlights()">Search Flights</button>
+</section>
+
+<!-- FLIGHT POPUP -->
+<div id="flightPopup" class="modal">
+  <div class="modal-content large">
+    <h2>Available Flights</h2>
+    <div id="flightResults"></div>
+    <button onclick="closePopup()">Close</button>
+  </div>
 </div>
 
-<!-- RESULTS -->
-<div id="results"></div>
-
-<!-- SEAT MODAL -->
-<div id="seatModal" class="modal">
-    <div class="modal-content">
-        <h2>Select Seat</h2>
-        <div id="seats" class="seats"></div>
-        <button onclick="showPassengerForm()">Next</button>
+<!-- SEAT SELECTION -->
+<div id="seatPopup" class="modal">
+  <div class="modal-content large">
+    <h2>Select Your Seat</h2>
+    <div class="plane">
+      <div id="seats"></div>
     </div>
+    <button onclick="goToPayment()">Continue</button>
+  </div>
 </div>
 
-<!-- PASSENGER MODAL -->
-<div id="passengerModal" class="modal">
-    <div class="modal-content">
-        <h2>Passenger Details</h2>
-        <input type="text" placeholder="Full Name">
-        <input type="text" placeholder="Email or Phone">
-        <button onclick="showPayment()">Continue to Payment</button>
-    </div>
-</div>
+<!-- PAYMENT -->
+<div id="paymentPage" class="payment-page">
+  <h2>Payment</h2>
 
-<!-- PAYMENT MODAL -->
-<div id="paymentModal" class="modal">
-    <div class="modal-content">
-        <h2>Payment Details</h2>
+  <input id="cardName" placeholder="Card Holder Name">
+  <input id="cardNumber" placeholder="Card Number (16 digits)">
+  <input id="expDate" placeholder="MM/YY">
+  <input id="cvv" placeholder="CVV">
 
-        <p>Selected Seat: <b id="seatInfo"></b></p>
-
-        <input type="text" placeholder="Card Holder Name">
-        <input type="text" placeholder="Card Number">
-        <input type="text" placeholder="Expiry Date (MM/YY)">
-        <input type="password" placeholder="CVV">
-
-        <p><b>Total: 150 €</b></p>
-
-        <button onclick="pay()">Pay Now</button>
-    </div>
+  <button onclick="pay()">Pay Now</button>
 </div>
 
 <script src="script.js"></script>

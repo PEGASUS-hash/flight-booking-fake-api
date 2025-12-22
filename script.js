@@ -1,92 +1,86 @@
+const cities = ["Rabat","Casablanca","Paris","Barcelona","Madrid","London","Rome"];
 const flights = [
-    {
-        airline: "Air France",
-        route: "Paris → London",
-        time: "08:00 - 09:30",
-        price: 120
-    },
-    {
-        airline: "Ryanair",
-        route: "Paris → London",
-        time: "12:00 - 13:20",
-        price: 90
-    },
-    {
-        airline: "British Airways",
-        route: "Paris → London",
-        time: "18:00 - 19:30",
-        price: 150
-    }
+ { airline:"Air France", logo:"https://upload.wikimedia.org/wikipedia/commons/6/6b/Air_France_Logo.svg", price:120 },
+ { airline:"Ryanair", logo:"https://upload.wikimedia.org/wikipedia/commons/3/3b/Ryanair_logo.svg", price:90 },
+ { airline:"Iberia", logo:"https://upload.wikimedia.org/wikipedia/commons/2/20/Iberia-logo.svg", price:110 }
 ];
 
 let selectedSeat = "";
 
-function setStep(stepNumber) {
-    document.querySelectorAll(".step").forEach((s, i) => {
-        s.classList.toggle("active", i === stepNumber - 1);
+/* AUTOCOMPLETE */
+function setupAuto(inputId, listId) {
+ const input = document.getElementById(inputId);
+ const list = document.getElementById(listId);
+
+ input.oninput = () => {
+  list.innerHTML = "";
+  cities.filter(c => c.toLowerCase().startsWith(input.value.toLowerCase()))
+    .forEach(c => {
+      const div = document.createElement("div");
+      div.innerText = c;
+      div.onclick = () => { input.value = c; list.innerHTML=""; };
+      list.appendChild(div);
     });
+ };
+}
+setupAuto("fromCity","fromList");
+setupAuto("toCity","toList");
+
+/* SEARCH */
+function searchFlights(){
+ document.getElementById("flightPopup").style.display="flex";
+ let html="";
+ flights.forEach(f=>{
+  html+=`
+   <div class="flight-card">
+    <img src="${f.logo}">
+    <div>${f.airline}</div>
+    <div>${f.price} €</div>
+    <button onclick="openSeats()">Book</button>
+   </div>`;
+ });
+ document.getElementById("flightResults").innerHTML=html;
 }
 
-function searchFlights() {
-    setStep(1);
-    let html = "";
-    flights.forEach(f => {
-        html += `
-            <div class="card">
-                <h3>${f.airline}</h3>
-                <p>${f.route}</p>
-                <p>${f.time}</p>
-                <p><b>${f.price} €</b></p>
-                <button onclick="openSeatMap()">Book</button>
-            </div>
-        `;
-    });
-    document.getElementById("results").innerHTML = html;
+function closePopup(){
+ document.getElementById("flightPopup").style.display="none";
 }
 
-/* STEP 2 */
-function openSeatMap() {
-    setStep(2);
-    seatModal.style.display = "flex";
-    let seats = "";
-
-    for (let i = 1; i <= 20; i++) {
-        let occupied = i % 6 === 0;
-        seats += `
-            <div class="seat ${occupied ? 'occupied' : ''}"
-            onclick="${occupied ? '' : `selectSeat('A${i}', this)`}">
-            A${i}
-            </div>`;
-    }
-    document.getElementById("seats").innerHTML = seats;
+/* SEATS */
+function openSeats(){
+ closePopup();
+ document.getElementById("seatPopup").style.display="flex";
+ let html="";
+ for(let i=1;i<=30;i++){
+  let occ = i%7===0;
+  html+=`<div class="seat ${occ?'occupied':''}" 
+  onclick="${occ?'':`selectSeat('S${i}',this)`}">S${i}</div>`;
+ }
+ document.getElementById("seats").innerHTML=html;
 }
 
-function selectSeat(seat, el) {
-    document.querySelectorAll(".seat").forEach(s => s.classList.remove("selected"));
-    el.classList.add("selected");
-    selectedSeat = seat;
+function selectSeat(s,e){
+ document.querySelectorAll(".seat").forEach(x=>x.classList.remove("selected"));
+ e.classList.add("selected");
+ selectedSeat=s;
 }
 
-/* STEP 3 */
-function showPassengerForm() {
-    if (!selectedSeat) {
-        alert("Please select a seat first");
-        return;
-    }
-    setStep(3);
-    seatModal.style.display = "none";
-    passengerModal.style.display = "flex";
+function goToPayment(){
+ if(!selectedSeat){ alert("Select seat"); return; }
+ document.getElementById("seatPopup").style.display="none";
+ document.getElementById("paymentPage").style.display="block";
 }
 
-/* STEP 4 */
-function showPayment() {
-    setStep(4);
-    passengerModal.style.display = "none";
-    paymentModal.style.display = "flex";
-    document.getElementById("seatInfo").innerText = selectedSeat;
-}
+/* PAYMENT VALIDATION */
+function pay(){
+ const num=document.getElementById("cardNumber").value;
+ const exp=document.getElementById("expDate").value;
+ const cvv=document.getElementById("cvv").value;
 
-function pay() {
-    alert("Payment Successful ✅\nThank you for your booking!");
-    location.reload();
+ if(!/^\d{16}$/.test(num)){ alert("Card must be 16 digits"); return; }
+ if(!/^\d{2}\/\d{2}$/.test(exp)){ alert("Expiry MM/YY"); return; }
+ if(!/^\d{3}$/.test(cvv)){ alert("CVV 3 digits"); return; }
+
+ alert("Payment Successful ✅");
+ location.reload();
 }
