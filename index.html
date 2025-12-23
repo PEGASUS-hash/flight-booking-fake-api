@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SkyBook – Flight Booking</title>
+  <title>SkyBook – Vols pas chers</title>
   <link rel="stylesheet" href="style.css">
   <script src="//unpkg.com/three/build/three.min.js"></script>
   <script src="//unpkg.com/globe.gl"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <header>
@@ -20,14 +21,12 @@
     </div>
     <div class="tabs">
       <button class="active">Vols</button>
-      <button>Hôtels</button>
-      <button>Voitures</button>
     </div>
     <h1>Des millions de vols pas chers. Une simple recherche.</h1>
   </header>
 
   <!-- LOGIN MODAL -->
-  <div id="loginModal" class="modal" style="display: none;">
+  <div id="loginModal" class="modal">
     <div class="modal-content">
       <h2>Se connecter</h2>
       <input type="email" id="loginEmail" placeholder="Email">
@@ -39,7 +38,7 @@
   </div>
 
   <!-- REGISTER MODAL -->
-  <div id="registerModal" class="modal" style="display: none;">
+  <div id="registerModal" class="modal">
     <div class="modal-content">
       <h2>Créer un compte</h2>
       <input type="text" id="regName" placeholder="Nom">
@@ -65,7 +64,7 @@
         <div id="fromList" class="suggestions" aria-live="polite"></div>
       </div>
 
-      <div class="switch-icon">↔️</div>
+      <button class="switch-btn" onclick="switchCities()">↔️</button>
 
       <div class="input-group">
         <label for="toCity">Vers</label>
@@ -89,17 +88,17 @@
           <option>1 Adulte, Économie</option>
           <option>2 Adultes, Économie</option>
           <option>1 Adulte, Business</option>
+          <option>2 Adultes, Business</option>
         </select>
       </div>
 
-      <button onclick="searchFlights()">Rechercher</button>
+      <button class="search-btn" onclick="searchFlights()">Rechercher</button>
     </div>
 
     <div class="options">
       <label><input type="checkbox" id="nearbyFrom"> Ajouter des aéroports à proximité</label>
       <label><input type="checkbox" id="nearbyTo"> Ajouter des aéroports à proximité</label>
       <label><input type="checkbox" id="directOnly"> Vols directs</label>
-      <label><input type="checkbox"> Ajouter un hôtel</label>
     </div>
   </section>
 
@@ -108,67 +107,67 @@
     <div class="globe-container">
       <div id="globeViz"></div>
     </div>
-    <p id="loadingText">Flying from ... to ...</p>
+    <p id="loadingText">Recherche en cours...</p>
   </div>
 
   <!-- FLIGHT RESULTS (Step 2) -->
   <section id="flightsPage" class="page" style="display: none;">
-    <h2>Available Flights</h2>
+    <h2>Résultats des vols</h2>
     <div id="flightResults"></div>
-    <button onclick="backToSearch()" class="back-btn">← Back</button>
+    <button onclick="backToSearch()" class="back-btn">← Retour</button>
   </section>
 
   <!-- SEAT SELECTION (Step 3) -->
   <section id="seatPage" class="page" style="display: none;">
-    <h2>Select Your Seat</h2>
+    <h2>Sélectionnez votre siège</h2>
     <div class="plane-layout">
-      <div class="nose">✈️ Nose</div>
+      <div class="nose">✈️ Avant</div>
       <div class="cabin">
         <div class="aisle-labels">
           <span>A</span><span>B</span><span>C</span><span class="aisle"></span><span>D</span><span>E</span><span>F</span>
         </div>
         <div id="seats"></div>
       </div>
-      <div class="emergency-exit" id="exit1">Emergency Exit</div>
-      <div class="emergency-exit" id="exit2">Emergency Exit</div>
-      <div class="tail">Tail ✈️</div>
+      <div class="emergency-exit">Sortie de secours</div>
+      <div class="emergency-exit">Sortie de secours</div>
+      <div class="tail">Arrière ✈️</div>
     </div>
-    <p id="seatPrice">Selected Seat Price: €0</p>
-    <button onclick="goToLuggage()">Continue to Luggage</button>
-    <button onclick="backToFlights()" class="back-btn">← Back</button>
+    <p id="seatPrice">Prix du siège sélectionné : €0</p>
+    <button onclick="goToLuggage()">Continuer vers les bagages</button>
+    <button onclick="backToFlights()" class="back-btn">← Retour</button>
   </section>
 
   <!-- LUGGAGE SELECTION (Step 4) -->
   <section id="luggagePage" class="page" style="display: none;">
-    <h2>Add Luggage</h2>
+    <h2>Ajouter des bagages</h2>
     <div class="luggage-options">
-      <label>Carry-on (Free)</label>
+      <label>Bagage cabine (Gratuit)</label>
       <input type="number" id="carryOn" min="0" max="2" value="1">
 
-      <label>Checked Bags (€30 each)</label>
+      <label>Bagages en soute (€30 chacun)</label>
       <input type="number" id="checkedBags" min="0" max="3" value="0">
     </div>
-    <p id="luggageCost">Luggage Cost: €0</p>
-    <button onclick="goToDetails()">Continue to Details</button>
-    <button onclick="backToSeats()" class="back-btn">← Back</button>
+    <p id="luggageCost">Coût des bagages : €0</p>
+    <button onclick="goToDetails()">Continuer vers les détails</button>
+    <button onclick="backToSeats()" class="back-btn">← Retour</button>
   </section>
 
   <!-- PASSENGER DETAILS (Step 5) -->
   <section id="detailsPage" class="page" style="display: none;">
-    <h2>Passenger Details</h2>
-    <input type="text" id="firstName" placeholder="First Name" required>
-    <input type="text" id="lastName" placeholder="Last Name" required>
+    <h2>Détails du passager</h2>
+    <input type="text" id="firstName" placeholder="Prénom" required>
+    <input type="text" id="lastName" placeholder="Nom de famille" required>
     <input type="email" id="email" placeholder="Email" required>
-    <input type="text" id="passport" placeholder="Passport Number" required>
-    <button onclick="goToPayment()">Continue to Payment</button>
-    <button onclick="backToLuggage()" class="back-btn">← Back</button>
+    <input type="text" id="passport" placeholder="Numéro de passeport" required>
+    <button onclick="goToPayment()">Continuer vers le paiement</button>
+    <button onclick="backToLuggage()" class="back-btn">← Retour</button>
   </section>
 
   <!-- PAYMENT PAGE (Step 6) -->
   <section id="paymentPage" class="page" style="display: none;">
-    <h2>Payment Details</h2>
+    <h2>Détails du paiement</h2>
     <div id="cartSummary" class="cart-details">
-      <h3>Your Booking Cart</h3>
+      <h3>Résumé de votre réservation</h3>
       <ul>
         <li id="cartFlight"></li>
         <li id="cartDate"></li>
@@ -179,22 +178,16 @@
       </ul>
     </div>
     <form id="paymentForm" novalidate>
-      <input type="text" id="cardName" placeholder="Card Holder Name" required>
-      <input type="text" id="cardNumber" placeholder="Card Number (16 digits)" maxlength="19" required>
+      <input type="text" id="cardName" placeholder="Nom du titulaire de la carte" required>
+      <input type="text" id="cardNumber" placeholder="Numéro de carte (16 chiffres)" maxlength="19" required>
       <div class="row">
-        <input type="text" id="expDate" placeholder="MM/YY" maxlength="5" required>
+        <input type="text" id="expDate" placeholder="MM/AA" maxlength="5" required>
         <input type="text" id="cvv" placeholder="CVV" maxlength="3" required>
       </div>
-      <button type="submit">Pay Now</button>
+      <button type="submit">Payer maintenant</button>
     </form>
-    <button onclick="backToDetails()" class="back-btn">← Back</button>
+    <button onclick="backToDetails()" class="back-btn">← Retour</button>
   </section>
-
-  <footer>
-    <button>🏠 Hôtels</button>
-    <button>🚗 Location de voiture</button>
-    <button>🌍 Explorez le monde entier</button>
-  </footer>
 
   <script src="script.js"></script>
 </body>
