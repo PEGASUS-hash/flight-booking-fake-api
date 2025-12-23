@@ -10,35 +10,104 @@
 </head>
 <body>
   <header>
-    <h1>✈️ SkyBook</h1>
-    <p>Search & Book Flights Easily</p>
+    <div class="header-top">
+      <div class="logo">✈️ SkyBook</div>
+      <nav>
+        <a href="#">Aide</a>
+        <a href="#">❤️</a>
+        <a href="#" onclick="showLogin()">Se connecter</a>
+      </nav>
+    </div>
+    <div class="tabs">
+      <button class="active">Vols</button>
+      <button>Hôtels</button>
+      <button>Voitures</button>
+    </div>
+    <h1>Des millions de vols pas chers. Une simple recherche.</h1>
   </header>
+
+  <!-- LOGIN MODAL -->
+  <div id="loginModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <h2>Se connecter</h2>
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPassword" placeholder="Mot de passe">
+      <button onclick="login()">Connexion</button>
+      <p>Pas de compte? <a href="#" onclick="showRegister()">Créer un compte</a></p>
+      <button class="close-btn" onclick="closeModal('loginModal')">✕</button>
+    </div>
+  </div>
+
+  <!-- REGISTER MODAL -->
+  <div id="registerModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <h2>Créer un compte</h2>
+      <input type="text" id="regName" placeholder="Nom">
+      <input type="email" id="regEmail" placeholder="Email">
+      <input type="password" id="regPassword" placeholder="Mot de passe">
+      <button onclick="register()">S'inscrire</button>
+      <p>Déjà un compte? <a href="#" onclick="showLogin()">Se connecter</a></p>
+      <button class="close-btn" onclick="closeModal('registerModal')">✕</button>
+    </div>
+  </div>
 
   <!-- SEARCH SECTION (Step 1) -->
   <section id="searchPage" class="search-box">
-    <div class="input-group">
-      <label for="fromCity">From</label>
-      <input id="fromCity" type="text" placeholder="e.g. Barcelona" autocomplete="off">
-      <div id="fromList" class="suggestions" aria-live="polite"></div>
+    <div class="trip-type">
+      <label><input type="radio" name="tripType" value="oneway" checked> Aller simple</label>
+      <label><input type="radio" name="tripType" value="return"> Aller-retour</label>
     </div>
 
-    <div class="input-group">
-      <label for="toCity">To</label>
-      <input id="toCity" type="text" placeholder="e.g. Paris" autocomplete="off">
-      <div id="toList" class="suggestions" aria-live="polite"></div>
+    <div class="search-form">
+      <div class="input-group">
+        <label for="fromCity">De</label>
+        <input id="fromCity" type="text" placeholder="e.g. Rabat (RBA)" autocomplete="off">
+        <div id="fromList" class="suggestions" aria-live="polite"></div>
+      </div>
+
+      <div class="switch-icon">↔️</div>
+
+      <div class="input-group">
+        <label for="toCity">Vers</label>
+        <input id="toCity" type="text" placeholder="e.g. Marseille (MRS)" autocomplete="off">
+        <div id="toList" class="suggestions" aria-live="polite"></div>
+      </div>
+
+      <div class="input-group">
+        <label for="departDate">Départ</label>
+        <input id="departDate" type="date">
+      </div>
+
+      <div class="input-group" id="returnDateGroup" style="display: none;">
+        <label for="returnDate">Retour</label>
+        <input id="returnDate" type="date">
+      </div>
+
+      <div class="input-group">
+        <label for="travelers">Voyageurs et classe</label>
+        <select id="travelers">
+          <option>1 Adulte, Économie</option>
+          <option>2 Adultes, Économie</option>
+          <option>1 Adulte, Business</option>
+        </select>
+      </div>
+
+      <button onclick="searchFlights()">Rechercher</button>
     </div>
 
-    <div class="input-group">
-      <label for="dateInput">Departure Date</label>
-      <input id="dateInput" type="date">
+    <div class="options">
+      <label><input type="checkbox" id="nearbyFrom"> Ajouter des aéroports à proximité</label>
+      <label><input type="checkbox" id="nearbyTo"> Ajouter des aéroports à proximité</label>
+      <label><input type="checkbox" id="directOnly"> Vols directs</label>
+      <label><input type="checkbox"> Ajouter un hôtel</label>
     </div>
-
-    <button onclick="searchFlights()">Search Flights</button>
   </section>
 
   <!-- LOADING ANIMATION WITH 3D GLOBE -->
   <div id="loadingAnimation" class="loading" style="display: none;">
-    <div id="globeViz" style="width: 100%; height: 100%;"></div>
+    <div class="globe-container">
+      <div id="globeViz"></div>
+    </div>
     <p id="loadingText">Flying from ... to ...</p>
   </div>
 
@@ -98,7 +167,17 @@
   <!-- PAYMENT PAGE (Step 6) -->
   <section id="paymentPage" class="page" style="display: none;">
     <h2>Payment Details</h2>
-    <p id="summary">Summary: Flight from ... to ..., Seat ..., Luggage ..., Total: €...</p>
+    <div id="cartSummary" class="cart-details">
+      <h3>Your Booking Cart</h3>
+      <ul>
+        <li id="cartFlight"></li>
+        <li id="cartDate"></li>
+        <li id="cartPassenger"></li>
+        <li id="cartSeat"></li>
+        <li id="cartLuggage"></li>
+        <li id="cartTotal"></li>
+      </ul>
+    </div>
     <form id="paymentForm" novalidate>
       <input type="text" id="cardName" placeholder="Card Holder Name" required>
       <input type="text" id="cardNumber" placeholder="Card Number (16 digits)" maxlength="19" required>
@@ -110,6 +189,12 @@
     </form>
     <button onclick="backToDetails()" class="back-btn">← Back</button>
   </section>
+
+  <footer>
+    <button>🏠 Hôtels</button>
+    <button>🚗 Location de voiture</button>
+    <button>🌍 Explorez le monde entier</button>
+  </footer>
 
   <script src="script.js"></script>
 </body>
