@@ -1,61 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>SkyBook – Flight Booking</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyBook – Flight Booking</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <header>
+    <h1>✈️ SkyBook</h1>
+    <p>Search & Book Flights Easily</p>
+  </header>
 
-<header>
-  <h1>✈️ SkyBook</h1>
-  <p>Search & Book Flights Easily</p>
-</header>
+  <!-- SEARCH SECTION (Step 1) -->
+  <section id="searchPage" class="search-box">
+    <div class="input-group">
+      <label for="fromCity">From</label>
+      <input id="fromCity" type="text" placeholder="e.g. Barcelona" autocomplete="off">
+      <div id="fromList" class="suggestions" aria-live="polite"></div>
+    </div>
 
-<!-- SEARCH -->
-<section class="search-box">
-  <input id="fromCity" type="text" placeholder="From (e.g. RA)">
-  <div id="fromList" class="suggestions"></div>
+    <div class="input-group">
+      <label for="toCity">To</label>
+      <input id="toCity" type="text" placeholder="e.g. Paris" autocomplete="off">
+      <div id="toList" class="suggestions" aria-live="polite"></div>
+    </div>
 
-  <input id="toCity" type="text" placeholder="To (e.g. BAR)">
-  <div id="toList" class="suggestions"></div>
+    <div class="input-group">
+      <label for="dateInput">Departure Date</label>
+      <input id="dateInput" type="date">
+      <label class="checkbox">
+        <input type="checkbox" id="wholeMonth"> Search whole month
+      </label>
+    </div>
 
-  <input id="dateInput" type="month">
-  <button onclick="searchFlights()">Search Flights</button>
-</section>
+    <button onclick="searchFlights()">Search Flights</button>
+  </section>
 
-<!-- FLIGHT POPUP -->
-<div id="flightPopup" class="modal">
-  <div class="modal-content large">
+  <!-- LOADING ANIMATION -->
+  <div id="loadingAnimation" class="loading">
+    <div class="plane-animation">✈️</div>
+    <p id="loadingText">Flying from ... to ...</p>
+  </div>
+
+  <!-- FLIGHT RESULTS (Step 2) -->
+  <section id="flightsPage" class="page" style="display: none;">
     <h2>Available Flights</h2>
     <div id="flightResults"></div>
-    <button onclick="closePopup()">Close</button>
-  </div>
-</div>
+    <button onclick="backToSearch()" class="back-btn">← Back</button>
+  </section>
 
-<!-- SEAT SELECTION -->
-<div id="seatPopup" class="modal">
-  <div class="modal-content large">
+  <!-- SEAT SELECTION (Step 3) -->
+  <section id="seatPage" class="page" style="display: none;">
     <h2>Select Your Seat</h2>
-    <div class="plane">
-      <div id="seats"></div>
+    <div class="plane-layout">
+      <div class="cabin">
+        <div class="aisle-labels">
+          <span>A</span><span>B</span><span>C</span><span class="aisle"></span><span>D</span><span>E</span><span>F</span>
+        </div>
+        <div id="seats"></div>
+      </div>
     </div>
-    <button onclick="goToPayment()">Continue</button>
-  </div>
-</div>
+    <p id="seatPrice">Selected Seat Price: €0</p>
+    <button onclick="goToLuggage()">Continue to Luggage</button>
+    <button onclick="backToFlights()" class="back-btn">← Back</button>
+  </section>
 
-<!-- PAYMENT -->
-<div id="paymentPage" class="payment-page">
-  <h2>Payment</h2>
+  <!-- LUGGAGE SELECTION (Step 4) -->
+  <section id="luggagePage" class="page" style="display: none;">
+    <h2>Add Luggage</h2>
+    <div class="luggage-options">
+      <label>Carry-on (Free)</label>
+      <input type="number" id="carryOn" min="0" max="2" value="1">
 
-  <input id="cardName" placeholder="Card Holder Name">
-  <input id="cardNumber" placeholder="Card Number (16 digits)">
-  <input id="expDate" placeholder="MM/YY">
-  <input id="cvv" placeholder="CVV">
+      <label>Checked Bags (€30 each)</label>
+      <input type="number" id="checkedBags" min="0" max="3" value="0">
+    </div>
+    <p id="luggageCost">Luggage Cost: €0</p>
+    <button onclick="goToPayment()">Continue to Payment</button>
+    <button onclick="backToSeats()" class="back-btn">← Back</button>
+  </section>
 
-  <button onclick="pay()">Pay Now</button>
-</div>
+  <!-- PAYMENT PAGE (Step 5) -->
+  <section id="paymentPage" class="page" style="display: none;">
+    <h2>Payment Details</h2>
+    <p id="summary">Summary: Flight from ... to ..., Seat ..., Luggage ..., Total: €...</p>
+    <form id="paymentForm" novalidate>
+      <input type="text" id="cardName" placeholder="Card Holder Name" required>
+      <input type="text" id="cardNumber" placeholder="Card Number (16 digits)" maxlength="19" required>
+      <div class="row">
+        <input type="text" id="expDate" placeholder="MM/YY" maxlength="5" required>
+        <input type="text" id="cvv" placeholder="CVV" maxlength="3" required>
+      </div>
+      <button type="submit">Pay Now</button>
+    </form>
+    <button onclick="backToLuggage()" class="back-btn">← Back</button>
+  </section>
 
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
