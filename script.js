@@ -1,4 +1,4 @@
-// script.js - Clean, modern, professional JavaScript
+// script.js - Clean, Professional JavaScript
 let selected = {
   tripType: 'return',
   from: '',
@@ -8,7 +8,8 @@ let selected = {
   departDate: '',
   returnDate: '',
   adults: 1,
-  cabinClass: 'Économie'
+  cabinClass: 'Économie',
+  directOnly: false
 };
 
 const cities = [
@@ -21,21 +22,17 @@ const cities = [
   { name: "Madrid", code: "MAD" },
   { name: "New York", code: "NYC" },
   { name: "Dubai", code: "DXB" },
-  { name: "Tokyo", code: "TYO" }
+  { name: "Tokyo", code: "TYO" },
+  { name: "Berlin", code: "BER" },
+  { name: "Rome", code: "FCO" }
 ];
 
-const cityCoords = {
-  Paris: { lat: 48.8566, lng: 2.3522 },
-  Marseille: { lat: 43.2965, lng: 5.3698 },
-  Rabat: { lat: 34.0209, lng: -6.8416 },
-  Casablanca: { lat: 33.5731, lng: -7.5898 },
-  London: { lat: 51.5074, lng: -0.1278 },
-  Barcelona: { lat: 41.3851, lng: 2.1734 },
-  Madrid: { lat: 40.4168, lng: -3.7038 },
-  "New York": { lat: 40.7128, lng: -74.0060 },
-  Dubai: { lat: 25.2048, lng: 55.2708 },
-  Tokyo: { lat: 35.6762, lng: 139.6503 }
-};
+const airlines = [
+  { name: "Air France", logo: "https://upload.wikimedia.org/wikipedia/commons/6/6b/Air_France_Logo.svg", price: 189 },
+  { name: "Ryanair", logo: "https://upload.wikimedia.org/wikipedia/commons/3/3b/Ryanair_logo.svg", price: 79 },
+  { name: "Royal Air Maroc", logo: "https://upload.wikimedia.org/wikipedia/commons/1/14/Royal_Air_Maroc_logo.svg", price: 145 },
+  { name: "EasyJet", logo: "https://upload.wikimedia.org/wikipedia/commons/9/95/EasyJet_logo.svg", price: 99 }
+];
 
 // Trip type toggle
 document.querySelectorAll('.trip-option').forEach(option => {
@@ -66,7 +63,7 @@ function setupAutocomplete(inputId, dropdownId) {
 
     matches.forEach(city => {
       const item = document.createElement('div');
-      item.textContent = `${city.name} (${city.code})`;
+      item.innerHTML = `<strong>${city.name}</strong> <span style="color:#666;">(${city.code})</span>`;
       item.onclick = () => {
         input.value = `${city.name} (${city.code})`;
         dropdown.style.display = 'none';
@@ -98,20 +95,29 @@ setupAutocomplete('toCity', 'toList');
 function swapCities() {
   const from = document.getElementById('fromCity');
   const to = document.getElementById('toCity');
-  [from.value, to.value] = [to.value, from.value];
-  [selected.from, selected.to] = [selected.to, selected.from];
-  [selected.fromCode, selected.toCode] = [selected.toCode, selected.fromCode];
+  const tempValue = from.value;
+  from.value = to.value;
+  to.value = tempValue;
+
+  const tempFrom = selected.from;
+  const tempFromCode = selected.fromCode;
+  selected.from = selected.to;
+  selected.fromCode = selected.toCode;
+  selected.to = tempFrom;
+  selected.toCode = tempFromCode;
 }
 
 // Passenger selector
 function togglePassengerDropdown() {
   const dropdown = document.getElementById('passengerDropdown');
   dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+  document.querySelector('.arrow').style.transform = dropdown.style.display === 'block' ? 'rotate(180deg)' : 'rotate(0)';
 }
 
 function changePassengers(delta) {
   selected.adults = Math.max(1, selected.adults + delta);
   document.getElementById('adults').textContent = selected.adults;
+  document.querySelector('button[onclick="changePassengers(-1)"]').disabled = selected.adults === 1;
   updatePassengerDisplay();
 }
 
@@ -139,38 +145,54 @@ function switchModal(id) {
   openModal(id);
 }
 
-// Search
+// Search flights - Now directly shows results (no globe)
 function searchFlights() {
   selected.departDate = document.getElementById('departDate').value;
   selected.returnDate = selected.tripType === 'return' ? document.getElementById('returnDate').value : '';
+  selected.directOnly = document.getElementById('directOnly').checked;
 
   if (!selected.from || !selected.to || !selected.departDate) {
     alert('Veuillez remplir tous les champs obligatoires.');
     return;
   }
 
-  document.querySelector('.search-section').style.opacity = '0.5';
-  document.getElementById('loadingOverlay').style.display = 'flex';
+  if (selected.tripType === 'return' && !selected.returnDate) {
+    alert('Veuillez sélectionner une date de retour.');
+    return;
+  }
 
-  document.getElementById('fromText').textContent = `${selected.from} (${selected.fromCode})`;
-  document.getElementById('toText').textContent = `${selected.to} (${selected.toCode})`;
+  // Hide search, show results
+  document.querySelector('.search-section').style.display = 'none';
+  document.getElementById('resultsSection').style.display = 'block';
 
-  const globe = Globe()(document.getElementById('globeViz'))
-    .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
-    .backgroundColor('#0b1d3a')
-    .arcColor(() => '#00ddff')
-    .arcDashLength(0.4)
-    .arcDashGap(4)
-    .arcDashAnimateTime(2000);
+  const resultsContainer = document.getElementById('flightResults');
+  resultsContainer.innerHTML = '';
 
-  globe.arcsData([{
-    startLat: cityCoords[selected.from].lat,
-    startLng: cityCoords[selected.from].lng,
-    endLat: cityCoords[selected.to].lat,
-    endLng: cityCoords[selected.to].lng
-  }]);
+  // Show 4-6 mock flights
+  const numFlights = 5;
+  for (let i = 0; i < numFlights; i++) {
+    const airline = airlines[Math.floor(Math.random() * airlines.length)];
+    const duration = Math.floor(Math.random() * 6) + 2;
+    const stops = selected.directOnly ? 'Direct' : (Math.random() > 0.5 ? 'Direct' : '1 escale');
+    const price = airline.price + Math.floor(Math.random() * 100);
 
-  setTimeout(() => {
-    alert('Fonctionnalité de résultats en développement ! 🎉\nVotre projet est maintenant très professionnel.');
-  }, 5000);
+    const card = document.createElement('div');
+    card.className = 'flight-card';
+    card.innerHTML = `
+      <div class="flight-info">
+        <img src="${airline.logo}" alt="${airline.name}">
+        <div class="flight-details">
+          <strong>${airline.name}</strong>
+          <p>${selected.fromCode} → ${selected.toCode} • ${duration}h ${stops === 'Direct' ? '' : '• ' + stops}</p>
+          <p>${selected.departDate} ${selected.tripType === 'return' ? '→ ' + selected.returnDate : ''}</p>
+        </div>
+      </div>
+      <div class="flight-price">
+        <div class="price">€${price}</div>
+        <button class="select-btn">Sélectionner</button>
+      </div>
+    `;
+    card.onclick = () => alert('Félicitations ! Vous avez sélectionné ce vol.\n(Fonctionnalité complète en développement)');
+    resultsContainer.appendChild(card);
+  }
 }

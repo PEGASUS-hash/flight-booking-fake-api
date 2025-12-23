@@ -6,8 +6,6 @@
   <title>SkyBook – Vols pas chers</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="//unpkg.com/three/build/three.min.js"></script>
-  <script src="//unpkg.com/globe.gl"></script>
 </head>
 <body>
   <header class="header">
@@ -73,8 +71,14 @@
                 <svg class="arrow" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
               </div>
               <div id="passengerDropdown" class="dropdown passenger-dropdown" style="display:none;">
-                <div>Adultes: <button onclick="changePassengers(-1)" disabled>-</button> <span id="adults">1</span> <button onclick="changePassengers(1)">+</button></div>
-                <div>Classe: 
+                <div class="passenger-row">
+                  Adultes: 
+                  <button onclick="changePassengers(-1)" disabled>-</button> 
+                  <span id="adults">1</span> 
+                  <button onclick="changePassengers(1)">+</button>
+                </div>
+                <div class="passenger-row">
+                  Classe: 
                   <select id="classSelect">
                     <option>Économie</option>
                     <option>Premium</option>
@@ -97,6 +101,12 @@
             <label><input type="checkbox" id="nearbyTo"> Aéroports à proximité (arrivée)</label>
           </div>
         </div>
+      </section>
+
+      <!-- FLIGHT RESULTS -->
+      <section id="resultsSection" class="results-section" style="display:none;">
+        <h2 class="results-title">Meilleurs vols trouvés</h2>
+        <div id="flightResults" class="flight-results"></div>
       </section>
     </div>
   </main>
@@ -123,12 +133,6 @@
       <button class="primary-btn">S'inscrire</button>
       <p>Déjà un compte ? <a href="#" onclick="switchModal('loginModal')">Se connecter</a></p>
     </div>
-  </div>
-
-  <!-- GLOBE LOADING -->
-  <div id="loadingOverlay" class="loading-overlay">
-    <div id="globeViz" class="globe"></div>
-    <p class="loading-text">Recherche de vols de <span id="fromText"></span> à <span id="toText"></span>...</p>
   </div>
 
   <script src="script.js"></script>
