@@ -1,4 +1,4 @@
-/* style.css - Dark mode search bar with fixed dropdowns */
+/* style.css - Dark mode with fixed dropdown positioning */
 * {
   margin: 0;
   padding: 0;
@@ -147,20 +147,21 @@ body {
   outline: none;
 }
 
-/* Fixed dark dropdowns - now visible and working */
+/* Fixed dropdowns - now appear correctly below the input */
 .dropdown {
   position: absolute;
-  top: calc(100% + 4px);
-  left: 20px;
-  right: 20px;
+  top: 100%;
+  left: 0;
+  right: 0;
   background: #111;
   border-radius: 12px;
   max-height: 320px;
   overflow-y: auto;
   box-shadow: 0 12px 30px rgba(0,0,0,0.6);
-  z-index: 30;
+  z-index: 1000;
   border: 1px solid rgba(255,255,255,0.1);
   display: none;
+  margin-top: 4px;
 }
 
 .dropdown div {
@@ -232,16 +233,17 @@ body {
 }
 
 .passenger-dropdown {
-  padding: 20px;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
   background: #111;
   border-radius: 12px;
   box-shadow: 0 12px 30px rgba(0,0,0,0.5);
   color: #fff;
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 20px;
-  right: 20px;
-  z-index: 30;
+  z-index: 1000;
+  margin-top: 4px;
+  padding: 20px;
 }
 
 .passenger-row {

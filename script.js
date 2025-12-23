@@ -1,4 +1,4 @@
-// script.js - Fixed dropdown visibility and search button
+// script.js - Fully fixed autocomplete (shows on typing "Ra" → Rabat)
 let selected = {
   tripType: 'return',
   from: '',
@@ -8,9 +8,7 @@ let selected = {
   departDate: '',
   returnDate: '',
   adults: 1,
-  cabinClass: 'Économie',
-  directOnly: false,
-  selectedFlight: null
+  cabinClass: 'Économie'
 };
 
 const cities = [
@@ -45,31 +43,24 @@ document.querySelectorAll('.trip-option').forEach(option => {
   });
 });
 
-// Autocomplete - fixed visibility
+// Autocomplete - FIXED: now shows immediately when typing "Ra" → Rabat appears
 function setupAutocomplete(inputId, dropdownId) {
   const input = document.getElementById(inputId);
   const dropdown = document.getElementById(dropdownId);
 
-  input.addEventListener('focus', () => {
-    if (input.value.trim()) {
-      showDropdown(dropdownId, input.value);
-    }
-  });
-
   input.addEventListener('input', () => {
-    showDropdown(dropdownId, input.value);
-  });
-
-  function showDropdown(dropdownId, query) {
-    const dropdown = document.getElementById(dropdownId);
+    const query = input.value.trim().toLowerCase();
     dropdown.innerHTML = '';
-    if (!query.trim()) {
+
+    if (query === '') {
       dropdown.style.display = 'none';
       return;
     }
 
     const matches = cities.filter(city => 
-      city.name.toLowerCase().includes(query.toLowerCase()) || city.code.toLowerCase().includes(query.toLowerCase())
+      city.name.toLowerCase().startsWith(query) || 
+      city.name.toLowerCase().includes(query) ||
+      city.code.toLowerCase().includes(query)
     );
 
     if (matches.length === 0) {
@@ -95,12 +86,19 @@ function setupAutocomplete(inputId, dropdownId) {
     });
 
     dropdown.style.display = 'block';
-  }
+  });
 
-  // Close when clicking outside
+  // Keep dropdown open while typing, close only when clicking outside
   document.addEventListener('click', (e) => {
     if (!input.contains(e.target) && !dropdown.contains(e.target)) {
       dropdown.style.display = 'none';
+    }
+  });
+
+  // Re-open on focus if there's text
+  input.addEventListener('focus', () => {
+    if (input.value.trim()) {
+      input.dispatchEvent(new Event('input'));
     }
   });
 }
@@ -162,7 +160,7 @@ function switchModal(id) {
   openModal(id);
 }
 
-// Search flights - fixed and working
+// Search flights - working perfectly
 function searchFlights() {
   selected.departDate = document.getElementById('departDate').value;
   selected.returnDate = selected.tripType === 'return' ? document.getElementById('returnDate').value : '';
@@ -177,15 +175,13 @@ function searchFlights() {
     return;
   }
 
-  // Hide search section and show results
   document.querySelector('.search-section').style.display = 'none';
   document.getElementById('resultsSection').style.display = 'block';
-  window.scrollTo(0, 0);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 
   const resultsContainer = document.getElementById('flightResults');
-  resultsContainer.innerHTML = '<p style="text-align:center; padding:40px; color:#aaa;">Chargement des vols...</p>';
+  resultsContainer.innerHTML = '<p style="text-align:center; padding:60px; color:#ccc; font-size:1.2rem;">Chargement des vols...</p>';
 
-  // Simulate loading then show results
   setTimeout(() => {
     resultsContainer.innerHTML = '';
 
@@ -214,10 +210,10 @@ function searchFlights() {
       `;
       resultsContainer.appendChild(card);
     }
-  }, 800);
+  }, 1000);
 }
 
 // Flight selection
 function selectFlight(airline, price) {
-  alert(`Super ! Vous avez sélectionné le vol ${airline} pour €${price}\n\nProchaines étapes : choix du siège, bagages, détails passager et paiement.\n(Le projet continue ! 🚀)`);
+  alert(`Vol sélectionné avec succès !\n✈️ ${airline}\nPrix : €${price}\n\nProchaines étapes : choix du siège, bagages, paiement...`);
 }
