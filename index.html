@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SkyBook – Flight Booking</title>
   <link rel="stylesheet" href="style.css">
+  <script src="//unpkg.com/three/build/three.min.js"></script>
+  <script src="//unpkg.com/globe.gl"></script>
 </head>
 <body>
   <header>
@@ -29,17 +31,14 @@
     <div class="input-group">
       <label for="dateInput">Departure Date</label>
       <input id="dateInput" type="date">
-      <label class="checkbox">
-        <input type="checkbox" id="wholeMonth"> Search whole month
-      </label>
     </div>
 
     <button onclick="searchFlights()">Search Flights</button>
   </section>
 
-  <!-- LOADING ANIMATION -->
-  <div id="loadingAnimation" class="loading">
-    <div class="plane-animation">✈️</div>
+  <!-- LOADING ANIMATION WITH 3D GLOBE -->
+  <div id="loadingAnimation" class="loading" style="display: none;">
+    <div id="globeViz" style="width: 100%; height: 100%;"></div>
     <p id="loadingText">Flying from ... to ...</p>
   </div>
 
@@ -54,12 +53,16 @@
   <section id="seatPage" class="page" style="display: none;">
     <h2>Select Your Seat</h2>
     <div class="plane-layout">
+      <div class="nose">✈️ Nose</div>
       <div class="cabin">
         <div class="aisle-labels">
           <span>A</span><span>B</span><span>C</span><span class="aisle"></span><span>D</span><span>E</span><span>F</span>
         </div>
         <div id="seats"></div>
       </div>
+      <div class="emergency-exit" id="exit1">Emergency Exit</div>
+      <div class="emergency-exit" id="exit2">Emergency Exit</div>
+      <div class="tail">Tail ✈️</div>
     </div>
     <p id="seatPrice">Selected Seat Price: €0</p>
     <button onclick="goToLuggage()">Continue to Luggage</button>
@@ -77,11 +80,22 @@
       <input type="number" id="checkedBags" min="0" max="3" value="0">
     </div>
     <p id="luggageCost">Luggage Cost: €0</p>
-    <button onclick="goToPayment()">Continue to Payment</button>
+    <button onclick="goToDetails()">Continue to Details</button>
     <button onclick="backToSeats()" class="back-btn">← Back</button>
   </section>
 
-  <!-- PAYMENT PAGE (Step 5) -->
+  <!-- PASSENGER DETAILS (Step 5) -->
+  <section id="detailsPage" class="page" style="display: none;">
+    <h2>Passenger Details</h2>
+    <input type="text" id="firstName" placeholder="First Name" required>
+    <input type="text" id="lastName" placeholder="Last Name" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="text" id="passport" placeholder="Passport Number" required>
+    <button onclick="goToPayment()">Continue to Payment</button>
+    <button onclick="backToLuggage()" class="back-btn">← Back</button>
+  </section>
+
+  <!-- PAYMENT PAGE (Step 6) -->
   <section id="paymentPage" class="page" style="display: none;">
     <h2>Payment Details</h2>
     <p id="summary">Summary: Flight from ... to ..., Seat ..., Luggage ..., Total: €...</p>
@@ -94,7 +108,7 @@
       </div>
       <button type="submit">Pay Now</button>
     </form>
-    <button onclick="backToLuggage()" class="back-btn">← Back</button>
+    <button onclick="backToDetails()" class="back-btn">← Back</button>
   </section>
 
   <script src="script.js"></script>

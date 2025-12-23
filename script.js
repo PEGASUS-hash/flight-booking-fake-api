@@ -4,6 +4,30 @@ const cities = [
   "Vienna", "Zurich", "Lisbon", "Athens", "Istanbul", "Moscow", "Beijing"
 ];
 
+const cityCoords = {
+  "Rabat": { lat: 34.01325, lng: -6.83255 },
+  "Casablanca": { lat: 33.5731, lng: -7.5898 },
+  "Paris": { lat: 48.85341, lng: 2.3488 },
+  "Barcelona": { lat: 41.38879, lng: 2.15899 },
+  "Madrid": { lat: 40.4333, lng: -3.7 },
+  "London": { lat: 51.50853, lng: -0.12574 },
+  "Rome": { lat: 41.90278, lng: 12.49637 },
+  "Brussels": { lat: 50.8503, lng: 4.3517 },
+  "Berlin": { lat: 52.5167, lng: 13.3833 },
+  "New York": { lat: 40.71427, lng: -74.00597 },
+  "Tokyo": { lat: 35.6833, lng: 139.7667 },
+  "Sydney": { lat: -33.8667, lng: 151 },
+  "Dubai": { lat: 25.2048, lng: 55.2708 },
+  "Amsterdam": { lat: 52.37518, lng: 4.897976 },
+  "Vienna": { lat: 48.2, lng: 16.3667 },
+  "Zurich": { lat: 47.3667, lng: 8.55 },
+  "Lisbon": { lat: 38.71667, lng: -9.13333 },
+  "Athens": { lat: 37.9833, lng: 23.7333 },
+  "Istanbul": { lat: 41.01384, lng: 28.94966 },
+  "Moscow": { lat: 55.75, lng: 37.6167 },
+  "Beijing": { lat: 39.9075, lng: 116.39723 }
+};
+
 const flights = [
   { airline: "Air France", logo: "https://upload.wikimedia.org/wikipedia/commons/6/6b/Air_France_Logo.svg", basePrice: 120 },
   { airline: "Ryanair", logo: "https://upload.wikimedia.org/wikipedia/commons/3/3b/Ryanair_logo.svg", basePrice: 90 },
@@ -14,13 +38,13 @@ let selected = {
   from: "",
   to: "",
   date: "",
-  wholeMonth: false,
   flight: null,
   seat: "",
   seatPrice: 0,
   carryOn: 1,
   checkedBags: 0,
   luggageCost: 0,
+  passenger: { firstName: "", lastName: "", email: "", passport: "" },
   total: 0
 };
 
@@ -36,7 +60,7 @@ function setupAutoComplete(inputId, listId) {
     if (!query) return;
 
     cities
-      .filter(city => city.toLowerCase().includes(query))  // Changed to includes for broader search
+      .filter(city => city.toLowerCase().includes(query))
       .sort((a, b) => a.toLowerCase().indexOf(query) - b.toLowerCase().indexOf(query))
       .forEach(city => {
         const item = document.createElement("div");
@@ -63,29 +87,63 @@ function setupAutoComplete(inputId, listId) {
 setupAutoComplete("fromCity", "fromList");
 setupAutoComplete("toCity", "toList");
 
-// Search flights with animation
+// Search flights with 3D globe animation
 function searchFlights() {
   selected.from = document.getElementById("fromCity").value.trim();
   selected.to = document.getElementById("toCity").value.trim();
   selected.date = document.getElementById("dateInput").value;
-  selected.wholeMonth = document.getElementById("wholeMonth").checked;
 
-  if (!selected.from || !selected.to || (!selected.date && !selected.wholeMonth)) {
+  if (!selected.from || !selected.to || !selected.date) {
     alert("Please fill in all fields.");
     return;
   }
 
-  // Show loading animation
+  if (!cityCoords[selected.from] || !cityCoords[selected.to]) {
+    alert("Coordinates not available for selected cities.");
+    return;
+  }
+
+  // Show loading with globe
   document.getElementById("searchPage").style.display = "none";
   const loading = document.getElementById("loadingAnimation");
   loading.style.display = "flex";
   document.getElementById("loadingText").textContent = `Flying from ${selected.from} to ${selected.to}...`;
 
-  // Simulate delay for animation
+  // Initialize Globe
+  const globe = Globe()
+    (document.getElementById('globeViz'))
+    .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+    .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+    .backgroundColor('rgba(0,0,0,0)');
+
+  // Add flight arc
+  const arc = [{
+    startLat: cityCoords[selected.from].lat,
+    startLng: cityCoords[selected.from].lng,
+    endLat: cityCoords[selected.to].lat,
+    endLng: cityCoords[selected.to].lng,
+    color: ['yellow', 'red'],
+    arcDashLength: 0.2,
+    arcDashGap: 0.8,
+    arcDashInitialGap: () => Math.random(),
+    arcDashAnimateTime: 3000
+  }];
+  globe.arcsData(arc);
+
+  // Auto-rotate
+  globe.controls().autoRotate = true;
+  globe.controls().autoRotateSpeed = 0.5;
+
+  // Focus on midpoint
+  const midLat = (cityCoords[selected.from].lat + cityCoords[selected.to].lat) / 2;
+  const midLng = (cityCoords[selected.from].lng + cityCoords[selected.to].lng) / 2;
+  globe.pointOfView({ lat: midLat, lng: midLng, altitude: 1.5 });
+
+  // Proceed after animation
   setTimeout(() => {
     loading.style.display = "none";
     showFlights();
-  }, 3000);  // 3 seconds animation
+  }, 4000);  // Slightly longer for visibility
 }
 
 function showFlights() {
@@ -99,7 +157,7 @@ function showFlights() {
         <div class="info">
           <strong>${f.airline}</strong>
           <p>${selected.from} → ${selected.to}</p>
-          <p>Date: ${selected.wholeMonth ? "Any in month" : selected.date}</p>
+          <p>Date: ${selected.date}</p>
         </div>
         <div class="price">From €${f.basePrice}</div>
         <button class="book-btn">Select</button>
@@ -124,20 +182,26 @@ function openSeats() {
   document.getElementById("seatPage").style.display = "block";
 
   let html = "";
+  const exitRows = [5];  // Emergency exit at row 5
   for (let row = 1; row <= 10; row++) {
-    html += `<div class="row">`;
-    for (let col of ['A', 'B', 'C', '', 'D', 'E', 'F']) {  // Aisle in middle
+    if (exitRows.includes(row)) {
+      html += `<div class="exit-row">Emergency Exit Row ${row}</div>`;
+      continue;
+    }
+    html += `<div class="seat-row">`;
+    for (let col of ['A', 'B', 'C', '', 'D', 'E', 'F']) {
       if (col === '') {
         html += `<div class="aisle"></div>`;
         continue;
       }
       const seatNum = `${row}${col}`;
-      const occupied = Math.random() < 0.2;  // 20% occupied
-      const price = row <= 2 ? 50 : (row <= 5 ? 20 : 0);  // Premium front rows
+      const occupied = Math.random() < 0.2;
+      const priceAdd = row <= 2 ? 50 : (exitRows.includes(row + 1) || exitRows.includes(row - 1) ? 30 : 0);  // Extra for premium and exit rows
+      const price = selected.flight.basePrice + priceAdd;
       html += `
         <div class="seat ${occupied ? 'occupied' : ''}" 
-             ${occupied ? '' : `onclick="selectSeat('${seatNum}', ${price + selected.flight.basePrice}, this)"`}
-             role="button" tabindex="0" aria-label="Seat ${seatNum}${occupied ? ' (occupied)' : ''} - €${price + selected.flight.basePrice}">
+             ${occupied ? '' : `onclick="selectSeat('${seatNum}', ${price}, this)"`}
+             role="button" tabindex="0" aria-label="Seat ${seatNum}${occupied ? ' (occupied)' : ''} - €${price}">
           ${seatNum}
         </div>`;
     }
@@ -166,8 +230,6 @@ function goToLuggage() {
   }
   document.getElementById("seatPage").style.display = "none";
   document.getElementById("luggagePage").style.display = "block";
-
-  // Update luggage cost on change
   document.getElementById("checkedBags").addEventListener('input', updateLuggageCost);
   updateLuggageCost();
 }
@@ -184,17 +246,37 @@ function backToSeats() {
   document.getElementById("seatPage").style.display = "block";
 }
 
-function goToPayment() {
+function goToDetails() {
   document.getElementById("luggagePage").style.display = "none";
-  document.getElementById("paymentPage").style.display = "block";
-
-  selected.total = selected.seatPrice + selected.luggageCost;
-  document.getElementById("summary").textContent = `Summary: Flight from ${selected.from} to ${selected.to} with ${selected.flight.airline}, Seat ${selected.seat}, Luggage: ${selected.carryOn} carry-on + ${selected.checkedBags} checked, Total: €${selected.total}`;
+  document.getElementById("detailsPage").style.display = "block";
 }
 
 function backToLuggage() {
-  document.getElementById("paymentPage").style.display = "none";
+  document.getElementById("detailsPage").style.display = "none";
   document.getElementById("luggagePage").style.display = "block";
+}
+
+function goToPayment() {
+  selected.passenger.firstName = document.getElementById("firstName").value.trim();
+  selected.passenger.lastName = document.getElementById("lastName").value.trim();
+  selected.passenger.email = document.getElementById("email").value.trim();
+  selected.passenger.passport = document.getElementById("passport").value.trim();
+
+  if (!selected.passenger.firstName || !selected.passenger.lastName || !selected.passenger.email || !selected.passenger.passport) {
+    alert("Please fill in all passenger details.");
+    return;
+  }
+
+  document.getElementById("detailsPage").style.display = "none";
+  document.getElementById("paymentPage").style.display = "block";
+
+  selected.total = selected.seatPrice + selected.luggageCost;
+  document.getElementById("summary").textContent = `Summary: Flight from ${selected.from} to ${selected.to} with ${selected.flight.airline}, Date: ${selected.date}, Passenger: ${selected.passenger.firstName} ${selected.passenger.lastName} (Email: ${selected.passenger.email}, Passport: ${selected.passenger.passport}), Seat: ${selected.seat}, Luggage: ${selected.carryOn} carry-on + ${selected.checkedBags} checked, Total: €${selected.total}`;
+}
+
+function backToDetails() {
+  document.getElementById("paymentPage").style.display = "none";
+  document.getElementById("detailsPage").style.display = "block";
 }
 
 // Payment validation

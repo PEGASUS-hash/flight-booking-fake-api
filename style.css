@@ -57,20 +57,10 @@ header p {
   font-weight: 600;
 }
 
-.checkbox {
-  display: flex;
-  align-items: center;
-  margin-top: 8px;
-}
-
-.checkbox input {
-  margin-right: 8px;
-}
-
 .search-box input,
 .page input,
 .search-box button,
-.page button {
+.page button:not(.back-btn) {
   width: 100%;
   padding: 14px;
   border: none;
@@ -123,7 +113,7 @@ header p {
   background: #f0f0f0;
 }
 
-/* Loading Animation */
+/* Loading with Globe */
 .loading {
   display: none;
   flex-direction: column;
@@ -136,14 +126,11 @@ header p {
   color: white;
 }
 
-.plane-animation {
-  font-size: 3rem;
-  animation: fly 3s linear infinite;
-}
-
-@keyframes fly {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+#globeViz {
+  width: 80vw;
+  height: 80vw;
+  max-width: 600px;
+  max-height: 600px;
 }
 
 #loadingText {
@@ -198,8 +185,22 @@ header p {
 .plane-layout {
   background: rgba(0,0,0,0.4);
   padding: 20px;
-  border-radius: 12px;
+  border-radius: 30px 30px 10px 10px; /* Curved nose */
   margin: 20px 0;
+  position: relative;
+  border: 2px solid #aaa;
+}
+
+.nose, .tail {
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 10px;
+  background: #555;
+  border-radius: 50% 50% 0 0;
+}
+
+.tail {
+  border-radius: 0 0 50% 50%;
 }
 
 .cabin {
@@ -224,11 +225,20 @@ header p {
   flex-direction: column;
 }
 
-.row {
+.seat-row {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 5px;
   margin-bottom: 5px;
+}
+
+.exit-row {
+  text-align: center;
+  background: #ffcc00;
+  color: black;
+  padding: 10px;
+  margin: 10px 0;
+  font-weight: bold;
 }
 
 .seat {
@@ -273,6 +283,11 @@ header p {
 .luggage-options input {
   background: #333;
   color: white;
+}
+
+/* Details Page */
+#detailsPage input {
+  margin-bottom: 10px;
 }
 
 /* Payment */
@@ -323,8 +338,7 @@ header p {
   .price {
     margin: 10px 0;
   }
-  .row {
-    grid-template-columns: repeat(7, 1fr);
+  .seat-row {
     gap: 3px;
   }
   .seat {
