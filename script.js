@@ -1,4 +1,4 @@
-// script.js - Clean, Professional JavaScript
+// script.js - Fixed flight selection
 let selected = {
   tripType: 'return',
   from: '',
@@ -9,7 +9,8 @@ let selected = {
   returnDate: '',
   adults: 1,
   cabinClass: 'Économie',
-  directOnly: false
+  directOnly: false,
+  selectedFlight: null
 };
 
 const cities = [
@@ -63,7 +64,7 @@ function setupAutocomplete(inputId, dropdownId) {
 
     matches.forEach(city => {
       const item = document.createElement('div');
-      item.innerHTML = `<strong>${city.name}</strong> <span style="color:#666;">(${city.code})</span>`;
+      item.innerHTML = `<strong>${city.name}</strong> <span style="color:#888;">(${city.code})</span>`;
       item.onclick = () => {
         input.value = `${city.name} (${city.code})`;
         dropdown.style.display = 'none';
@@ -145,11 +146,11 @@ function switchModal(id) {
   openModal(id);
 }
 
-// Search flights - Now directly shows results (no globe)
+// Search flights
 function searchFlights() {
   selected.departDate = document.getElementById('departDate').value;
   selected.returnDate = selected.tripType === 'return' ? document.getElementById('returnDate').value : '';
-  selected.directOnly = document.getElementById('directOnly').checked;
+  selected.directOnly = document.getElementById('directOnly') ? document.getElementById('directOnly').checked : false;
 
   if (!selected.from || !selected.to || !selected.departDate) {
     alert('Veuillez remplir tous les champs obligatoires.');
@@ -168,13 +169,13 @@ function searchFlights() {
   const resultsContainer = document.getElementById('flightResults');
   resultsContainer.innerHTML = '';
 
-  // Show 4-6 mock flights
-  const numFlights = 5;
+  // Generate mock flights
+  const numFlights = 6;
   for (let i = 0; i < numFlights; i++) {
     const airline = airlines[Math.floor(Math.random() * airlines.length)];
-    const duration = Math.floor(Math.random() * 6) + 2;
-    const stops = selected.directOnly ? 'Direct' : (Math.random() > 0.5 ? 'Direct' : '1 escale');
-    const price = airline.price + Math.floor(Math.random() * 100);
+    const duration = Math.floor(Math.random() * 8) + 2;
+    const stops = selected.directOnly || Math.random() > 0.4 ? 'Direct' : '1 escale';
+    const price = airline.price + Math.floor(Math.random() * 120) - 40;
 
     const card = document.createElement('div');
     card.className = 'flight-card';
@@ -184,15 +185,20 @@ function searchFlights() {
         <div class="flight-details">
           <strong>${airline.name}</strong>
           <p>${selected.fromCode} → ${selected.toCode} • ${duration}h ${stops === 'Direct' ? '' : '• ' + stops}</p>
-          <p>${selected.departDate} ${selected.tripType === 'return' ? '→ ' + selected.returnDate : ''}</p>
+          <p>${selected.departDate} ${selected.tripType === 'return' ? '→ ' + selected.returnDate : ''} • ${selected.adults} adulte(s)</p>
         </div>
       </div>
       <div class="flight-price">
         <div class="price">€${price}</div>
-        <button class="select-btn">Sélectionner</button>
+        <button class="select-btn" onclick="selectFlight(event, '${airline.name}', ${price})">Sélectionner</button>
       </div>
     `;
-    card.onclick = () => alert('Félicitations ! Vous avez sélectionné ce vol.\n(Fonctionnalité complète en développement)');
     resultsContainer.appendChild(card);
   }
+}
+
+// Flight selection - now works (stops propagation and shows alert)
+function selectFlight(event, airline, price) {
+  event.stopPropagation(); // Prevent card click if needed
+  alert(`Vol sélectionné !\nCompagnie: ${airline}\nPrix: €${price}\n\nProchaines étapes : choix du siège, bagages, paiement... (en développement)`);
 }

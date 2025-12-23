@@ -1,4 +1,4 @@
-/* style.css - Professional & Modern Design (Skyscanner-inspired) */
+/* style.css - Dark mode search bar (black background) */
 * {
   margin: 0;
   padding: 0;
@@ -102,11 +102,14 @@ body {
   background: #007bff;
 }
 
+/* Dark search card */
 .search-card {
-  background: #fff;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(20px);
   border-radius: 16px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
   overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
 }
 
 .search-grid {
@@ -122,7 +125,7 @@ body {
 
 .field label {
   font-size: 0.85rem;
-  color: #666;
+  color: rgba(255,255,255,0.7);
   margin-bottom: 8px;
   display: block;
   font-weight: 500;
@@ -132,42 +135,49 @@ body {
   width: 100%;
   border: none;
   font-size: 1.15rem;
-  color: #001d3d;
+  color: #fff;
   background: transparent;
+}
+
+.field input::placeholder {
+  color: rgba(255,255,255,0.5);
 }
 
 .field input:focus {
   outline: none;
 }
 
+/* Dark dropdowns */
 .dropdown {
   position: absolute;
   top: 100%;
   left: 0;
   right: 0;
-  background: #fff;
+  background: #111;
   border-radius: 8px;
   max-height: 320px;
   overflow-y: auto;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.5);
   z-index: 20;
   display: none;
+  border: 1px solid rgba(255,255,255,0.1);
 }
 
 .dropdown div {
   padding: 14px 16px;
   cursor: pointer;
   transition: background 0.2s;
+  color: #fff;
   font-size: 1rem;
 }
 
 .dropdown div:hover {
-  background: #f0f8ff;
+  background: #222;
 }
 
 .swap-btn {
   align-self: center;
-  background: #f0f8ff;
+  background: rgba(255,255,255,0.1);
   border: none;
   width: 48px;
   height: 48px;
@@ -180,14 +190,14 @@ body {
 }
 
 .swap-btn:hover {
+  background: rgba(255,255,255,0.2);
   transform: scale(1.1);
-  background: #e0f0ff;
 }
 
 .swap-btn svg {
   width: 22px;
   height: 22px;
-  fill: #007bff;
+  fill: #00ddff;
 }
 
 .custom-select {
@@ -196,21 +206,22 @@ body {
   justify-content: space-between;
   align-items: center;
   font-size: 1.15rem;
-  color: #001d3d;
+  color: #fff;
 }
 
 .custom-select .arrow {
   width: 20px;
   height: 20px;
-  fill: #666;
+  fill: rgba(255,255,255,0.7);
   transition: transform 0.3s;
 }
 
 .passenger-dropdown {
   padding: 20px;
-  background: #fff;
+  background: #111;
   border-radius: 8px;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+  color: #fff;
 }
 
 .passenger-row {
@@ -258,23 +269,7 @@ body {
   fill: white;
 }
 
-.search-options {
-  padding: 24px 20px 20px;
-  display: flex;
-  gap: 28px;
-  flex-wrap: wrap;
-  font-size: 0.95rem;
-}
-
-.search-options label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  user-select: none;
-}
-
-/* Results Section */
+/* Results Section - unchanged (white cards for contrast) */
 .results-section {
   margin-top: 40px;
 }
@@ -360,7 +355,7 @@ body {
   background: #0056b3;
 }
 
-/* Modals */
+/* Modals - unchanged */
 .modal-overlay {
   position: fixed;
   inset: 0;
