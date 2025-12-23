@@ -1,4 +1,4 @@
-/* style.css - Dark mode search bar (black background) */
+/* style.css - Dark mode search bar with fixed dropdowns */
 * {
   margin: 0;
   padding: 0;
@@ -147,32 +147,47 @@ body {
   outline: none;
 }
 
-/* Dark dropdowns */
+/* Fixed dark dropdowns - now visible and working */
 .dropdown {
   position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
+  top: calc(100% + 4px);
+  left: 20px;
+  right: 20px;
   background: #111;
-  border-radius: 8px;
+  border-radius: 12px;
   max-height: 320px;
   overflow-y: auto;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.5);
-  z-index: 20;
-  display: none;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+  z-index: 30;
   border: 1px solid rgba(255,255,255,0.1);
+  display: none;
 }
 
 .dropdown div {
-  padding: 14px 16px;
+  padding: 16px 20px;
   cursor: pointer;
   transition: background 0.2s;
   color: #fff;
   font-size: 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.dropdown div:last-child {
+  border-bottom: none;
 }
 
 .dropdown div:hover {
   background: #222;
+}
+
+.dropdown div strong {
+  display: block;
+  font-size: 1.1rem;
+}
+
+.dropdown div span {
+  color: rgba(255,255,255,0.6);
+  font-size: 0.9rem;
 }
 
 .swap-btn {
@@ -219,9 +234,14 @@ body {
 .passenger-dropdown {
   padding: 20px;
   background: #111;
-  border-radius: 8px;
+  border-radius: 12px;
   box-shadow: 0 12px 30px rgba(0,0,0,0.5);
   color: #fff;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 20px;
+  right: 20px;
+  z-index: 30;
 }
 
 .passenger-row {
@@ -269,7 +289,7 @@ body {
   fill: white;
 }
 
-/* Results Section - unchanged (white cards for contrast) */
+/* Results Section */
 .results-section {
   margin-top: 40px;
 }
@@ -355,7 +375,7 @@ body {
   background: #0056b3;
 }
 
-/* Modals - unchanged */
+/* Modals */
 .modal-overlay {
   position: fixed;
   inset: 0;

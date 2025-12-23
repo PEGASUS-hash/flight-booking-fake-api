@@ -1,4 +1,4 @@
-// script.js - Fixed flight selection
+// script.js - Fixed dropdown visibility and search button
 let selected = {
   tripType: 'return',
   from: '',
@@ -45,22 +45,37 @@ document.querySelectorAll('.trip-option').forEach(option => {
   });
 });
 
-// Autocomplete
+// Autocomplete - fixed visibility
 function setupAutocomplete(inputId, dropdownId) {
   const input = document.getElementById(inputId);
   const dropdown = document.getElementById(dropdownId);
 
+  input.addEventListener('focus', () => {
+    if (input.value.trim()) {
+      showDropdown(dropdownId, input.value);
+    }
+  });
+
   input.addEventListener('input', () => {
-    const query = input.value.toLowerCase();
+    showDropdown(dropdownId, input.value);
+  });
+
+  function showDropdown(dropdownId, query) {
+    const dropdown = document.getElementById(dropdownId);
     dropdown.innerHTML = '';
-    if (!query) {
+    if (!query.trim()) {
       dropdown.style.display = 'none';
       return;
     }
 
     const matches = cities.filter(city => 
-      city.name.toLowerCase().includes(query) || city.code.toLowerCase().includes(query)
+      city.name.toLowerCase().includes(query.toLowerCase()) || city.code.toLowerCase().includes(query.toLowerCase())
     );
+
+    if (matches.length === 0) {
+      dropdown.style.display = 'none';
+      return;
+    }
 
     matches.forEach(city => {
       const item = document.createElement('div');
@@ -79,9 +94,10 @@ function setupAutocomplete(inputId, dropdownId) {
       dropdown.appendChild(item);
     });
 
-    dropdown.style.display = matches.length ? 'block' : 'none';
-  });
+    dropdown.style.display = 'block';
+  }
 
+  // Close when clicking outside
   document.addEventListener('click', (e) => {
     if (!input.contains(e.target) && !dropdown.contains(e.target)) {
       dropdown.style.display = 'none';
@@ -146,14 +162,13 @@ function switchModal(id) {
   openModal(id);
 }
 
-// Search flights
+// Search flights - fixed and working
 function searchFlights() {
   selected.departDate = document.getElementById('departDate').value;
   selected.returnDate = selected.tripType === 'return' ? document.getElementById('returnDate').value : '';
-  selected.directOnly = document.getElementById('directOnly') ? document.getElementById('directOnly').checked : false;
 
   if (!selected.from || !selected.to || !selected.departDate) {
-    alert('Veuillez remplir tous les champs obligatoires.');
+    alert('Veuillez sélectionner les villes de départ/arrivée et la date de départ.');
     return;
   }
 
@@ -162,43 +177,47 @@ function searchFlights() {
     return;
   }
 
-  // Hide search, show results
+  // Hide search section and show results
   document.querySelector('.search-section').style.display = 'none';
   document.getElementById('resultsSection').style.display = 'block';
+  window.scrollTo(0, 0);
 
   const resultsContainer = document.getElementById('flightResults');
-  resultsContainer.innerHTML = '';
+  resultsContainer.innerHTML = '<p style="text-align:center; padding:40px; color:#aaa;">Chargement des vols...</p>';
 
-  // Generate mock flights
-  const numFlights = 6;
-  for (let i = 0; i < numFlights; i++) {
-    const airline = airlines[Math.floor(Math.random() * airlines.length)];
-    const duration = Math.floor(Math.random() * 8) + 2;
-    const stops = selected.directOnly || Math.random() > 0.4 ? 'Direct' : '1 escale';
-    const price = airline.price + Math.floor(Math.random() * 120) - 40;
+  // Simulate loading then show results
+  setTimeout(() => {
+    resultsContainer.innerHTML = '';
 
-    const card = document.createElement('div');
-    card.className = 'flight-card';
-    card.innerHTML = `
-      <div class="flight-info">
-        <img src="${airline.logo}" alt="${airline.name}">
-        <div class="flight-details">
-          <strong>${airline.name}</strong>
-          <p>${selected.fromCode} → ${selected.toCode} • ${duration}h ${stops === 'Direct' ? '' : '• ' + stops}</p>
-          <p>${selected.departDate} ${selected.tripType === 'return' ? '→ ' + selected.returnDate : ''} • ${selected.adults} adulte(s)</p>
+    const numFlights = 6;
+    for (let i = 0; i < numFlights; i++) {
+      const airline = airlines[Math.floor(Math.random() * airlines.length)];
+      const duration = Math.floor(Math.random() * 8) + 2;
+      const stops = Math.random() > 0.4 ? 'Direct' : '1 escale';
+      const price = airline.price + Math.floor(Math.random() * 120) - 40;
+
+      const card = document.createElement('div');
+      card.className = 'flight-card';
+      card.innerHTML = `
+        <div class="flight-info">
+          <img src="${airline.logo}" alt="${airline.name}">
+          <div class="flight-details">
+            <strong>${airline.name}</strong>
+            <p>${selected.fromCode} → ${selected.toCode} • ${duration}h ${stops === 'Direct' ? '' : '• ' + stops}</p>
+            <p>${selected.departDate} ${selected.tripType === 'return' ? '→ ' + selected.returnDate : ''} • ${selected.adults} adulte(s)</p>
+          </div>
         </div>
-      </div>
-      <div class="flight-price">
-        <div class="price">€${price}</div>
-        <button class="select-btn" onclick="selectFlight(event, '${airline.name}', ${price})">Sélectionner</button>
-      </div>
-    `;
-    resultsContainer.appendChild(card);
-  }
+        <div class="flight-price">
+          <div class="price">€${price}</div>
+          <button class="select-btn" onclick="event.stopPropagation(); selectFlight('${airline.name}', ${price})">Sélectionner</button>
+        </div>
+      `;
+      resultsContainer.appendChild(card);
+    }
+  }, 800);
 }
 
-// Flight selection - now works (stops propagation and shows alert)
-function selectFlight(event, airline, price) {
-  event.stopPropagation(); // Prevent card click if needed
-  alert(`Vol sélectionné !\nCompagnie: ${airline}\nPrix: €${price}\n\nProchaines étapes : choix du siège, bagages, paiement... (en développement)`);
+// Flight selection
+function selectFlight(airline, price) {
+  alert(`Super ! Vous avez sélectionné le vol ${airline} pour €${price}\n\nProchaines étapes : choix du siège, bagages, détails passager et paiement.\n(Le projet continue ! 🚀)`);
 }
