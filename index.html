@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SkyBook – Vols pas chers</title>
-
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
@@ -20,9 +19,9 @@
   </div>
 </header>
 
-<main class="main">
+<main>
   <div class="container">
-    <h1 class="hero-title">Des millions de vols pas chers. Une simple recherche.</h1>
+    <h1 class="hero-title">Des millions de vols pas chers.<br>Une simple recherche.</h1>
 
     <section class="search-section">
       <div class="trip-type-selector">
@@ -32,69 +31,47 @@
 
       <div class="search-card">
         <div class="search-grid">
-
           <div class="field">
             <label>De</label>
-            <input id="fromCity" placeholder="Ville ou aéroport">
+            <input id="fromCity" placeholder="Ville ou aéroport" autocomplete="off"/>
             <div id="fromList" class="dropdown"></div>
           </div>
 
-          <button class="swap-btn" onclick="swapCities()">⇄</button>
+          <button class="swap-btn" title="Inverser les villes">⇄</button>
 
           <div class="field">
             <label>Vers</label>
-            <input id="toCity" placeholder="Ville ou aéroport">
+            <input id="toCity" placeholder="Ville ou aéroport" autocomplete="off"/>
             <div id="toList" class="dropdown"></div>
           </div>
 
           <div class="field">
             <label>Départ</label>
-            <input id="departDate" type="date">
+            <input id="departDate" type="date"/>
           </div>
 
           <div class="field return-field">
             <label>Retour</label>
-            <input id="returnDate" type="date">
+            <input id="returnDate" type="date"/>
           </div>
 
           <div class="field">
             <label>Passagers & classe</label>
-            <div class="custom-select" onclick="togglePassengerDropdown()">
-              <span id="passengerDisplay">1 Adulte, Économie</span>
-            </div>
-            <div id="passengerDropdown" class="dropdown passenger-dropdown">
-              <div class="passenger-row">
-                Adultes:
-                <button onclick="changePassengers(-1)">-</button>
-                <span id="adults">1</span>
-                <button onclick="changePassengers(1)">+</button>
-              </div>
-              <div class="passenger-row">
-                Classe:
-                <select id="classSelect">
-                  <option>Économie</option>
-                  <option>Business</option>
-                  <option>First</option>
-                </select>
-              </div>
-            </div>
+            <div class="custom-select" id="passengerDisplay">1 Adulte, Économie</div>
           </div>
 
-          <button class="search-button" onclick="searchFlights()">Rechercher</button>
-
+          <button class="search-button">Rechercher</button>
         </div>
       </div>
     </section>
 
     <section id="resultsSection" style="display:none;">
-      <h2>Meilleurs vols trouvés</h2>
+      <h2>Résultats de recherche</h2>
       <div id="flightResults"></div>
     </section>
-
   </div>
 </main>
 
-<!-- ✅ FIX: defer -->
-<script src="script.js" defer></script>
+<script src="script.js"></script>
 </body>
 </html>
